@@ -16,6 +16,7 @@
     </a>
 </div>
 
+
 @if($projects->isEmpty())
     <div class="card bg-base-100 shadow">
         <div class="card-body items-center text-center py-16">
@@ -46,6 +47,7 @@
                     </div>
                     <span class="text-xs text-base-content/50">{{ $project->owner->name }}</span>
                 </div>
+                    <span class="text-xs text-base-content/100">number of tasks: {{ $project->tasks->count()}}</span>
 
                 <div class="card-actions justify-end gap-1">
                     <a href="{{ route('projects.show', $project) }}" class="btn btn-ghost btn-xs">View</a>

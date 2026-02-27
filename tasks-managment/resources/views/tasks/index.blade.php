@@ -8,7 +8,7 @@
         <h1 class="text-2xl font-bold tracking-tight">Tasks</h1>
         <p class="text-base-content/60 text-sm mt-1">All tasks across your workspace</p>
     </div>
-    <a href="{{ route('tasks.create') }}" class="btn btn-primary btn-sm gap-2">
+    <a href="{{ route('projects.tasks.create', $project ) }}" class="btn btn-primary btn-sm gap-2">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
         </svg>
