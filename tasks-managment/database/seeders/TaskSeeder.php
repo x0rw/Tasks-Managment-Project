@@ -15,15 +15,18 @@ class TaskSeeder extends Seeder
         $users = User::all();
 
         foreach ($projects as $project) {
-            Task::create([
-                //'project_id' => $project->id,
-                'assigned_user_id' => $users->random()->id,
-                'title' => 'Sample Task for ' . $project->name,
-                'description' => 'This is a seeded task.',
-                'status' => 'todo',
-                'priority' => 'medium',
-                'due_date' => now()->addDays(7),
-            ]);
+            for ($i = 0; $i < 5; $i++) {
+                Task::create([
+                    'project_id' => $project->id,
+                    'assigned_user_id' => $users->random()->id,
+                    'title' => 'Task ' . ($i + 1) . ' for ' . $project->name,
+                    'description' => 'This is a seeded task.',
+                    'status' => collect(['todo', 'in_progress', 'done'])->random(),
+                    'priority' => collect(['low', 'medium', 'high'])->random(),
+                    'due_date' => now()->addDays(rand(3, 14)),
+                ]);
+            }
         }
     }
 }
+

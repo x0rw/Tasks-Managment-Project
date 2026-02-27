@@ -10,14 +10,15 @@ To test it download a postgres client and run `psql -h 127.0.0.1 -U devuser -d t
 
 ## Run Migrations
 
-run `cp .env.example .env` 
+copy the example env `cp .env.example .env` 
 then `php artisan migrate`
 
-## Mock users(for dev)
+## Run Seeders 
 
-Generate mock users as default for testing
+Run seeders to populate the database
 ```
-#php artisan tinker
-> \App\Models\User::factory(10)->create();
+php artisan db:seed
 ```
 ```
+
+
