@@ -43,8 +43,6 @@ class TaskController extends Controller
 
         $data['project_id'] = $projectID;
         $project = Project::findOrFail($projectID);
-        // dd($data);
-        // die();
         $task = $project->tasks()->create($data);
 
         return redirect()->route('projects.show', ["project" => $project])->with('success', 'Task created successfully.');
