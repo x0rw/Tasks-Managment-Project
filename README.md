@@ -2,7 +2,7 @@
 
 ## Objectif du projet 
 
-Développer une application web de gestion de tâches d’équipe permettant de manipuler les fonctionnalités principales de Laravel. 
+Développer une application web de gestion de tâches d’équipe permettant de manipuler les fonctionnalités principales de laravel. 
 
 ## Fonctionnalités à implémenter 
 
