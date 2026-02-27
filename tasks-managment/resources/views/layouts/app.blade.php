@@ -20,7 +20,7 @@
             100% { opacity: 0; pointer-events: none; }
         }
     </style>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.tsx'])
 </head>
 
 <body class="min-h-screen flex flex-col bg-base-200 font-sans">
