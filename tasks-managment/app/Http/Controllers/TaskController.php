@@ -2,28 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class TaskController extends Controller
 {
-    public function index()
+    public function index($projectID)
     {
-        $tasks = Task::with('assignedUser')->get();
+        $tasks = Task::where(['project_id' => $projectID])->get();
         $users = User::all();
+        $project = Project::findOrFail($projectID);
 
-        return view('tasks.index', compact('tasks', 'users'));
+        return view('tasks.index', compact('tasks', 'users', 'project'));
     }
 
-    public function create()
+    public function create($projectID)
     {
+
+        // dd($projectID);
         $users = User::all();
-        return view('tasks.create', compact('users'));
+        $project = Project::findOrFail($projectID);
+        return view('tasks.create', compact('users', 'project'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, string $projectID)
     {
+
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -33,9 +40,12 @@ class TaskController extends Controller
             'assigned_user_id' => 'nullable|exists:users,id',
         ]);
 
-        Task::create($data);
 
-        return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
+        $data['project_id'] = $projectID;
+        $project = Project::findOrFail($projectID);
+        $task = $project->tasks()->create($data);
+
+        return redirect()->route('projects.show', ["project" => $project])->with('success', 'Task created successfully.');
     }
 
     public function edit(Task $task)

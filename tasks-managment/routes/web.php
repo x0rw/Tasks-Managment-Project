@@ -18,5 +18,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::prefix('projects/{project_id}')->group(function () {
+    Route::get('/tasks', [TaskController::class, 'index'])->name('projects.tasks.index');
+    // Route::get('/tasks/{task_id}', [TaskController::class, 'show'])->name('projects.tasks.show');
+    Route::get('/tasks/create', [TaskController::class, 'create'])->name('projects.tasks.create');
+    Route::post('/tasks/store', [TaskController::class, 'store'])->name('projects.tasks.store');
+});
+
 
 Route::resource('projects', ProjectController::class);

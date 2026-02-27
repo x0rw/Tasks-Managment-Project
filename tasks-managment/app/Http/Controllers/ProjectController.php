@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
@@ -11,7 +12,8 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::with('owner')->latest()->get();
-        return view('projects.index', compact('projects'));
+        $users = User::all();
+        return view('projects.index', compact('projects', 'users'));
     }
 
     // Show create form
@@ -22,26 +24,28 @@ class ProjectController extends Controller
 
     // Store new project
     public function store(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'description' => 'nullable|string',
-    ]);
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
 
-    Project::create([
-        'name' => $request->name,
-        'description' => $request->description,
-        'owner_id' => 1, // ✅ mock user id for now
-    ]);
+        Project::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'owner_id' => 1, // ✅ mock user id for now
+        ]);
 
-    return redirect()->route('projects.index')
-                     ->with('success', 'Project created successfully.');
-}
+        return redirect()->route('projects.index')
+            ->with('success', 'Project created successfully.');
+    }
 
     // Show single project
     public function show(Project $project)
     {
-        return view('projects.show', compact('project'));
+
+        $users = User::all();
+        return view('projects.show', compact('project', 'users'));
     }
 
     // Show edit form
@@ -61,7 +65,7 @@ class ProjectController extends Controller
         $project->update($request->only('name', 'description'));
 
         return redirect()->route('projects.index')
-                         ->with('success', 'Project updated successfully.');
+            ->with('success', 'Project updated successfully.');
     }
 
     // Delete project
@@ -70,6 +74,7 @@ class ProjectController extends Controller
         $project->delete();
 
         return redirect()->route('projects.index')
-                         ->with('success', 'Project deleted successfully.');
+            ->with('success', 'Project deleted successfully.');
     }
 }
+

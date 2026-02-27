@@ -33,7 +33,7 @@
     {{-- Form card --}}
     <div class="card bg-base-100 shadow">
         <div class="card-body">
-            <form action="{{ route('tasks.store') }}" method="POST" class="space-y-5">
+            <form action="{{ route('projects.tasks.store', ["project_id" => $project->id]) }}" method="POST" class="space-y-5">
                 @csrf
 
                 {{-- Title --}}
@@ -89,6 +89,7 @@
                            class="input input-bordered w-full">
                 </div>
 
+
                 {{-- Assign User --}}
                 <div class="form-control">
                     <label class="label" for="assigned_user_id">
@@ -105,7 +106,7 @@
                 {{-- Actions --}}
                 <div class="flex items-center gap-3 pt-2">
                     <button type="submit" class="btn btn-primary flex-1">Create Task</button>
-                    <a href="{{ route('tasks.index') }}" class="btn btn-ghost flex-1">Cancel</a>
+                    <a href="{{ route('projects.index', ["project_id" => request()->route()->parameter('project_id')]) }}" class="btn btn-ghost flex-1">Cancel</a>
                 </div>
 
             </form>
