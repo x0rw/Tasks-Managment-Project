@@ -36,14 +36,34 @@
             </a>
         </div>
         <div class="navbar-end gap-2 px-4">
-            <a href="{{ route('projects.index') }}"
-               class="btn btn-ghost btn-sm {{ request()->routeIs('projects.*') ? 'bg-base-200' : '' }}">
-                Projects
-            </a>
-            <a href="{{ route('tasks.index') }}"
-               class="btn btn-ghost btn-sm {{ request()->routeIs('tasks.*') ? 'bg-base-200' : '' }}">
-                Tasks
-            </a>
+            @auth
+                <a href="{{ route('projects.index') }}"
+                   class="btn btn-ghost btn-sm {{ request()->routeIs('projects.*') ? 'bg-base-200' : '' }}">
+                    Projects
+                </a>
+                <a href="{{ route('tasks.index') }}"
+                   class="btn btn-ghost btn-sm {{ request()->routeIs('tasks.*') ? 'bg-base-200' : '' }}">
+                    Tasks
+                </a>
+
+                <span class="text-sm text-base-content/70 hidden sm:inline">
+                    {{ auth()->user()->name }}
+                </span>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="btn btn-outline btn-sm">Logout</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}"
+                   class="btn btn-ghost btn-sm {{ request()->routeIs('login') ? 'bg-base-200' : '' }}">
+                    Login
+                </a>
+                <a href="{{ route('register') }}"
+                   class="btn btn-primary btn-sm {{ request()->routeIs('register') ? 'btn-secondary' : '' }}">
+                    Register
+                </a>
+            @endauth
         </div>
     </nav>
 
