@@ -41,10 +41,6 @@
                    class="btn btn-ghost btn-sm {{ request()->routeIs('projects.*') ? 'bg-base-200' : '' }}">
                     Projects
                 </a>
-                <a href="{{ route('tasks.index') }}"
-                   class="btn btn-ghost btn-sm {{ request()->routeIs('tasks.*') ? 'bg-base-200' : '' }}">
-                    Tasks
-                </a>
 
                 <span class="text-sm text-base-content/70 hidden sm:inline">
                     {{ auth()->user()->name }}
