@@ -15,15 +15,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        // Seed one known user per role for testing
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name'  => 'Admin User',
+            'email' => 'admin@app.com',
+            'role'  => 'admin',
         ]);
 
+        User::factory()->create([
+            'name'  => 'Manager User',
+            'email' => 'manager@app.com',
+            'role'  => 'manager',
+        ]);
 
-        \App\Models\User::factory(5)->create();
+        User::factory()->create([
+            'name'  => 'Regular User',
+            'email' => 'user@app.com',
+            'role'  => 'user',
+        ]);
+
+        // Extra random users (role defaults to 'user')
+        User::factory(5)->create();
 
         $this->call([
             ProjectSeeder::class,

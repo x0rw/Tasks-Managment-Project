@@ -8,12 +8,14 @@
         <h1 class="text-2xl font-bold tracking-tight">Projects</h1>
         <p class="text-base-content/60 text-sm mt-1">Manage your workspace projects</p>
     </div>
+    @if(auth()->user()->hasAnyRole(['admin', 'manager']))
     <a href="{{ route('projects.create') }}" class="btn btn-primary btn-sm gap-2">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
         </svg>
         New Project
     </a>
+    @endif
 </div>
 
 
@@ -24,7 +26,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
             </svg>
             <p class="text-base-content/50 text-sm">No projects yet.</p>
+            @if(auth()->user()->hasAnyRole(['admin', 'manager']))
             <a href="{{ route('projects.create') }}" class="btn btn-primary btn-sm mt-3">Create your first one</a>
+            @endif
         </div>
     </div>
 @else
@@ -51,6 +55,7 @@
 
                 <div class="card-actions justify-end gap-1">
                     <a href="{{ route('projects.show', $project) }}" class="btn btn-ghost btn-xs">View</a>
+                    @if(auth()->user()->hasAnyRole(['admin', 'manager']))
                     <a href="{{ route('projects.edit', $project) }}" class="btn btn-ghost btn-xs">Edit</a>
                     <form action="{{ route('projects.destroy', $project) }}" method="POST"
                           onsubmit="return confirm('Delete this project?')">
@@ -58,6 +63,7 @@
                         @method('DELETE')
                         <button type="submit" class="btn btn-ghost btn-xs text-error">Delete</button>
                     </form>
+                    @endif
                 </div>
             </div>
         </div>

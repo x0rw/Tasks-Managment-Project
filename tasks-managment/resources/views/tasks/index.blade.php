@@ -8,12 +8,14 @@
         <h1 class="text-2xl font-bold tracking-tight">Tasks</h1>
         <p class="text-base-content/60 text-sm mt-1">All tasks across your workspace</p>
     </div>
+    @if(auth()->user()->hasAnyRole(['admin', 'manager']))
     <a href="{{ route('projects.tasks.create', $project ) }}" class="btn btn-primary btn-sm gap-2">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
         </svg>
         New Task
     </a>
+    @endif
 </div>
 
 {{-- Table card --}}
@@ -45,6 +47,11 @@
 
                     {{-- Status select --}}
                     <td>
+                        @php
+                            $canChangeStatus = auth()->user()->hasAnyRole(['admin','manager'])
+                                || $task->assigned_user_id === auth()->id();
+                        @endphp
+                        @if($canChangeStatus)
                         <form action="{{ route('tasks.updateStatus', $task) }}" method="POST">
                             @csrf
                             @method('PATCH')
@@ -58,6 +65,13 @@
                                 <option value="done"        {{ $task->status === 'done'        ? 'selected' : '' }}>Done</option>
                             </select>
                         </form>
+                        @else
+                            @php
+                                $statusLabel = ['todo' => 'To Do', 'in_progress' => 'In Progress', 'done' => 'Done'][$task->status] ?? $task->status;
+                                $statusClass = match($task->status) { 'done' => 'badge-success', 'in_progress' => 'badge-warning', default => 'badge-ghost' };
+                            @endphp
+                            <span class="badge badge-sm {{ $statusClass }} badge-soft">{{ $statusLabel }}</span>
+                        @endif
                     </td>
 
                     {{-- Priority badge --}}
@@ -79,6 +93,7 @@
 
                     {{-- Assign select --}}
                     <td>
+                        @if(auth()->user()->hasAnyRole(['admin', 'manager']))
                         <form action="{{ route('tasks.updateAssignment', $task) }}" method="POST">
                             @csrf
                             @method('PATCH')
@@ -92,10 +107,16 @@
                                 @endforeach
                             </select>
                         </form>
+                        @else
+                            <span class="text-sm text-base-content/60">
+                                {{ $task->assignedUser?->name ?? '—' }}
+                            </span>
+                        @endif
                     </td>
 
                     {{-- Actions --}}
                     <td>
+                        @if(auth()->user()->hasAnyRole(['admin', 'manager']))
                         <div class="flex items-center gap-1">
                             <a href="{{ route('tasks.edit', $task) }}" class="btn btn-ghost btn-xs">Edit</a>
                             <form action="{{ route('tasks.destroy', $task) }}" method="POST"
@@ -105,6 +126,9 @@
                                 <button type="submit" class="btn btn-ghost btn-xs text-error">Delete</button>
                             </form>
                         </div>
+                        @else
+                            <span class="text-xs text-base-content/40">—</span>
+                        @endif
                     </td>
 
                 </tr>
