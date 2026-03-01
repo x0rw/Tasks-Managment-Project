@@ -52,6 +52,7 @@
                     <th>Status</th>
                     <th>Priority</th>
                     <th>Due Date</th>
+                    <th>Created By</th>
                     <th>Assigned To</th>
                     <th>Actions</th>
                 </tr>
@@ -102,6 +103,18 @@
                         {{ $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('M j, Y') : '—' }}
                     </td>
 
+                    {{-- Creator --}}
+                    <td>
+                        <div class="flex items-center gap-2">
+                            <div class="avatar placeholder">
+                                <div class="bg-neutral text-neutral-content rounded-full w-6 h-6 text-xs">
+                                    <span>{{ strtoupper(substr($task->user->name ?? 'U', 0, 1)) }}</span>
+                                </div>
+                            </div>
+                            <span class="text-xs">{{ $task->user->name ?? 'Unknown' }}</span>
+                        </div>
+                    </td>
+
                     {{-- Assign select --}}
                     <td>
                         <form action="{{ route('tasks.updateAssignment', $task) }}" method="POST">
@@ -135,7 +148,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="py-16 text-center">
+                    <td colspan="8" class="py-16 text-center">
                         <svg class="w-10 h-10 mx-auto mb-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                         </svg>

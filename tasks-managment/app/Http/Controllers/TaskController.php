@@ -42,6 +42,8 @@ class TaskController extends Controller
 
 
         $data['project_id'] = $projectID;
+        $data['user_id'] = auth()->id();
+
         $project = Project::findOrFail($projectID);
         $task = $project->tasks()->create($data);
 
