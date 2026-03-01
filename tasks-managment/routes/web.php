@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TagController;
 
 Route::get('/', function () {
     return auth()->check()
@@ -32,6 +33,9 @@ Route::middleware('auth')->group(function () {
     Route::get('projects/{project}',     [ProjectController::class, 'show'])->name('projects.show');
     Route::get('tasks/{task}',           [TaskController::class,   'show'])->name('tasks.show');
 
+    // Tags — viewable by all auth users
+    Route::get('tags', [TagController::class, 'index'])->name('tags.index');
+
     // Status update: any authenticated user, but controller checks assigned_user_id
     Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])
         ->name('tasks.updateStatus');
@@ -49,6 +53,11 @@ Route::middleware('auth')->group(function () {
         Route::put('projects/{project}',         [ProjectController::class, 'update'])->name('projects.update');
         Route::patch('projects/{project}',       [ProjectController::class, 'update']);
         Route::delete('projects/{project}',      [ProjectController::class, 'destroy'])->name('projects.destroy');
+
+        // Tags — mutating
+        Route::post('tags',              [TagController::class, 'store'])->name('tags.store');
+        Route::put('tags/{tag}',         [TagController::class, 'update'])->name('tags.update');
+        Route::delete('tags/{tag}',      [TagController::class, 'destroy'])->name('tags.destroy');
 
         // Tasks — mutating (standalone resource)
         Route::get('tasks',                      [TaskController::class, 'index'])->name('tasks.index');

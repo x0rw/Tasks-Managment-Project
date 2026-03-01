@@ -29,6 +29,7 @@
                     <th>Status</th>
                     <th>Priority</th>
                     <th>Due Date</th>
+                    <th>Tags</th>
                     <th>Assigned To</th>
                     <th>Actions</th>
                 </tr>
@@ -89,6 +90,20 @@
                     {{-- Due date --}}
                     <td class="text-base-content/60">
                         {{ $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('M j, Y') : '—' }}
+                    </td>
+
+                    {{-- Tags --}}
+                    <td>
+                        <div class="flex flex-wrap gap-1">
+                            @forelse($task->tags as $tag)
+                                <span class="badge badge-xs font-medium"
+                                      style="background-color: {{ $tag->color }}; color: #fff; border: none;">
+                                    {{ $tag->name }}
+                                </span>
+                            @empty
+                                <span class="text-base-content/30 text-xs">—</span>
+                            @endforelse
+                        </div>
                     </td>
 
                     {{-- Assign select --}}
