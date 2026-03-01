@@ -58,6 +58,12 @@ class TaskController extends Controller
         return view('tasks.edit', compact('task', 'users', 'tags'));
     }
 
+    public function show(Task $task)
+    {
+        $task->load(['comments.user', 'tags', 'assignedUser']);
+        return view('tasks.show', compact('task'));
+    }
+
     public function update(Request $request, Task $task)
     {
         $data = $request->validate([

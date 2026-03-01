@@ -131,8 +131,9 @@
 
                     {{-- Actions --}}
                     <td>
-                        @if(auth()->user()->hasAnyRole(['admin', 'manager']))
-                        <div class="flex items-center gap-1">
+                        <div class="flex items-center gap-1 flex-nowrap">
+                            <a href="{{ route('tasks.show', $task) }}" class="btn btn-ghost btn-xs">View</a>
+                            @if(auth()->user()->hasAnyRole(['admin', 'manager']))
                             <a href="{{ route('tasks.edit', $task) }}" class="btn btn-ghost btn-xs">Edit</a>
                             <form action="{{ route('tasks.destroy', $task) }}" method="POST"
                                   onsubmit="return confirm('Delete this task?')">
@@ -140,10 +141,8 @@
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-ghost btn-xs text-error">Delete</button>
                             </form>
+                            @endif
                         </div>
-                        @else
-                            <span class="text-xs text-base-content/40">—</span>
-                        @endif
                     </td>
 
                 </tr>

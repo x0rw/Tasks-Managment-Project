@@ -14,7 +14,7 @@
 @if(auth()->user()->hasAnyRole(['admin', 'manager']))
 <div class="card bg-base-100 shadow mb-6">
     <div class="card-body">
-        <h2 class="card-title text-base mb-3">New Tag</h2>
+        <h2 class="font-semibold text-base mb-3">New Tag</h2>
         <form action="{{ route('tags.store') }}" method="POST" class="flex items-end gap-3 flex-wrap">
             @csrf
             <div class="form-control flex-1 min-w-48">
@@ -45,13 +45,13 @@
                     <th>Tag</th>
                     <th>Used on Tasks</th>
                     @if(auth()->user()->hasAnyRole(['admin', 'manager']))
-                    <th>Actions</th>
+                    <th class="w-64">Actions</th>
                     @endif
                 </tr>
             </thead>
             <tbody>
                 @forelse($tags as $tag)
-                <tr>
+                <tr x-data="{ editing: false }">
                     {{-- Colour pill --}}
                     <td>
                         <span class="badge badge-sm font-medium"
@@ -66,33 +66,30 @@
                     {{-- Edit / Delete (admin/manager) --}}
                     @if(auth()->user()->hasAnyRole(['admin', 'manager']))
                     <td>
-                        <div x-data="{ editing: false }" class="flex items-center gap-2">
-
-                            {{-- Toggle edit form --}}
-                            <button @click="editing = !editing" class="btn btn-ghost btn-xs">Edit</button>
-
-                            {{-- Delete --}}
+                        {{-- Default view: Edit + Delete buttons --}}
+                        <div x-show="!editing" class="flex items-center gap-2">
+                            <button @click="editing = true" class="btn btn-ghost btn-xs">Edit</button>
                             <form action="{{ route('tags.destroy', $tag) }}" method="POST"
                                   onsubmit="return confirm('Delete tag \'{{ $tag->name }}\'? It will be removed from all tasks.')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-ghost btn-xs text-error">Delete</button>
                             </form>
-
-                            {{-- Inline edit form --}}
-                            <form x-show="editing" x-cloak
-                                  action="{{ route('tags.update', $tag) }}" method="POST"
-                                  class="flex items-center gap-2 ml-2">
-                                @csrf
-                                @method('PUT')
-                                <input type="text" name="name" value="{{ $tag->name }}" required maxlength="50"
-                                       class="input input-bordered input-xs w-32">
-                                <input type="color" name="color" value="{{ $tag->color }}"
-                                       class="input input-bordered h-7 w-10 p-0.5 cursor-pointer">
-                                <button type="submit" class="btn btn-primary btn-xs">Save</button>
-                                <button type="button" @click="editing = false" class="btn btn-ghost btn-xs">Cancel</button>
-                            </form>
                         </div>
+
+                        {{-- Edit mode: inline form --}}
+                        <form x-show="editing" x-cloak
+                              action="{{ route('tags.update', $tag) }}" method="POST"
+                              class="flex items-center gap-2">
+                            @csrf
+                            @method('PUT')
+                            <input type="text" name="name" value="{{ $tag->name }}" required maxlength="50"
+                                   class="input input-bordered input-xs w-28">
+                            <input type="color" name="color" value="{{ $tag->color }}"
+                                   class="h-7 w-9 rounded cursor-pointer border border-base-300 p-0.5 bg-transparent">
+                            <button type="submit" class="btn btn-primary btn-xs">Save</button>
+                            <button type="button" @click="editing = false" class="btn btn-ghost btn-xs">Cancel</button>
+                        </form>
                     </td>
                     @endif
                 </tr>
