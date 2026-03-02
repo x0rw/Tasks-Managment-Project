@@ -102,6 +102,29 @@
                     </select>
                 </div>
 
+                {{-- Tags --}}
+                @if($tags->isNotEmpty())
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-medium">Tags <span class="text-base-content/40 font-normal">(optional)</span></span>
+                    </label>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($tags as $tag)
+                        @php $selectedTags = old('tags', $task->tags->pluck('id')->toArray()); @endphp
+                        <label class="cursor-pointer flex items-center gap-1.5">
+                            <input type="checkbox" name="tags[]" value="{{ $tag->id }}"
+                                   class="checkbox checkbox-xs"
+                                   {{ in_array($tag->id, $selectedTags) ? 'checked' : '' }}>
+                            <span class="badge badge-sm font-medium"
+                                  style="background-color: {{ $tag->color }}; color: #fff; border: none;">
+                                {{ $tag->name }}
+                            </span>
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 {{-- Actions --}}
                 <div class="flex items-center gap-3 pt-2">
                     <button type="submit" class="btn btn-primary flex-1">Save Changes</button>

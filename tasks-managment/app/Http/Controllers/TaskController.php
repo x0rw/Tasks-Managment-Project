@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Tag;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -21,11 +22,10 @@ class TaskController extends Controller
 
     public function create($projectID)
     {
-
-        // dd($projectID);
         $users = User::all();
+        $tags  = Tag::all();
         $project = Project::findOrFail($projectID);
-        return view('tasks.create', compact('users', 'project'));
+        return view('tasks.create', compact('users', 'project', 'tags'));
     }
 
     public function store(Request $request, string $projectID)
@@ -45,13 +45,17 @@ class TaskController extends Controller
         $project = Project::findOrFail($projectID);
         $task = $project->tasks()->create($data);
 
+        // Sync tags
+        $task->tags()->sync($request->tags ?? []);
+
         return redirect()->route('projects.show', ["project" => $project])->with('success', 'Task created successfully.');
     }
 
     public function edit(Task $task)
     {
         $users = User::all();
-        return view('tasks.edit', compact('task', 'users'));
+        $tags  = Tag::all();
+        return view('tasks.edit', compact('task', 'users', 'tags'));
     }
 
     public function update(Request $request, Task $task)
@@ -66,6 +70,9 @@ class TaskController extends Controller
         ]);
 
         $task->update($data);
+
+        // Sync tags
+        $task->tags()->sync($request->tags ?? []);
 
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
     }

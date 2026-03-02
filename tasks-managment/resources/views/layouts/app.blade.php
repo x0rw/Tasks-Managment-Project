@@ -42,6 +42,11 @@
                     Projects
                 </a>
 
+                <a href="{{ route('tags.index') }}"
+                   class="btn btn-ghost btn-sm {{ request()->routeIs('tags.*') ? 'bg-base-200' : '' }}">
+                    Tags
+                </a>
+
                 <span class="text-sm text-base-content/70 hidden sm:inline">
                     {{ auth()->user()->name }}
                 </span>
