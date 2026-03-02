@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\CommentController;
 
 Route::get('/', function () {
     return auth()->check()
@@ -30,23 +31,24 @@ Route::middleware('auth')->group(function () {
 
     // READ-ONLY: accessible to all authenticated users
     Route::get('projects',               [ProjectController::class, 'index'])->name('projects.index');
-    Route::get('projects/{project}',     [ProjectController::class, 'show'])->name('projects.show');
     Route::get('tasks/{task}',           [TaskController::class,   'show'])->name('tasks.show');
 
     // Tags — viewable by all auth users
     Route::get('tags', [TagController::class, 'index'])->name('tags.index');
 
+    // Comments — all auth users can post and delete their own
+    Route::post('tasks/{task}/comments',        [CommentController::class, 'store'])->name('comments.store');
+    Route::delete('comments/{comment}',         [CommentController::class, 'destroy'])->name('comments.destroy');
+
     // Status update: any authenticated user, but controller checks assigned_user_id
     Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])
         ->name('tasks.updateStatus');
-
-    // Comments: open to all authenticated users (no route guard needed)
 
     // ─── Admin / Manager only ───────────────────────────────────────────────
 
     Route::middleware('role:admin,manager')->group(function () {
 
-        // Projects — mutating
+        // Projects — mutating (create MUST come before {project} wildcard)
         Route::get('projects/create',            [ProjectController::class, 'create'])->name('projects.create');
         Route::post('projects',                  [ProjectController::class, 'store'])->name('projects.store');
         Route::get('projects/{project}/edit',    [ProjectController::class, 'edit'])->name('projects.edit');
@@ -59,7 +61,7 @@ Route::middleware('auth')->group(function () {
         Route::put('tags/{tag}',         [TagController::class, 'update'])->name('tags.update');
         Route::delete('tags/{tag}',      [TagController::class, 'destroy'])->name('tags.destroy');
 
-        // Tasks — mutating (standalone resource)
+        // Tasks — mutating (create MUST come before {task} wildcard)
         Route::get('tasks',                      [TaskController::class, 'index'])->name('tasks.index');
         Route::get('tasks/create',               [TaskController::class, 'create'])->name('tasks.create');
         Route::post('tasks',                     [TaskController::class, 'store'])->name('tasks.store');
@@ -79,4 +81,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/tasks/store', [TaskController::class, 'store'])->name('projects.tasks.store');
         });
     });
+
+    // projects/{project} wildcard MUST come AFTER all literal project routes
+    Route::get('projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
 });

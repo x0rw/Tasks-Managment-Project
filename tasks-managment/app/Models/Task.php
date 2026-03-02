@@ -30,4 +30,9 @@ class Task extends Model
     {
         return $this->belongsToMany(Tag::class, 'task_tag');
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->latest();
+    }
 }

@@ -13,16 +13,13 @@ class Comment extends Model
         'user_id',
     ];
 
-
-public function tasks()
+    public function task()
     {
         return $this->belongsTo(Task::class);
     }
-public function user()
 
-{
-return  $this->hasMany(Users::class);
-}
-
-
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

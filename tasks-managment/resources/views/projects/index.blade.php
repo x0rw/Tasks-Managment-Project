@@ -43,15 +43,17 @@
                     </p>
                 </div>
 
-                <div class="flex items-center gap-2 pt-1 border-t border-base-200">
-                    <div class="avatar placeholder">
-                        <div class="bg-primary text-primary-content rounded-full w-6 h-6 text-xs font-bold">
-                            <span>{{ strtoupper(substr($project->owner->name, 0, 1)) }}</span>
+                <div class="flex items-center justify-between pt-1 border-t border-base-200">
+                    <div class="flex items-center gap-2">
+                        <div class="avatar placeholder">
+                            <div class="bg-primary text-primary-content rounded-full w-6 h-6 text-xs font-bold">
+                                <span>{{ strtoupper(substr($project->owner->name, 0, 1)) }}</span>
+                            </div>
                         </div>
+                        <span class="text-xs text-base-content/50">{{ $project->owner->name }}</span>
                     </div>
-                    <span class="text-xs text-base-content/50">{{ $project->owner->name }}</span>
+                    <span class="badge badge-ghost badge-sm text-base-content/50">{{ $project->tasks->count() }} {{ Str::plural('task', $project->tasks->count()) }}</span>
                 </div>
-                    <span class="text-xs text-base-content/100">number of tasks: {{ $project->tasks->count()}}</span>
 
                 <div class="card-actions justify-end gap-1">
                     <a href="{{ route('projects.show', $project) }}" class="btn btn-ghost btn-xs">View</a>
