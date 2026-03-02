@@ -13,6 +13,7 @@ class Task extends Model
         'priority',
         'due_date',
         'assigned_user_id',
+        'project_id',
     ];
 
     public function assignedUser()
@@ -20,8 +21,8 @@ class Task extends Model
         return $this->belongsTo(User::class, 'assigned_user_id');
     }
 
-    public function assignedProject()
+    public function project()
     {
-        return $this->belongsTo(User::class, 'project_id');
+        return $this->belongsTo(Project::class, 'project_id');
     }
 }

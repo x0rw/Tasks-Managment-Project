@@ -85,6 +85,16 @@ class TaskController extends Controller
 
     public function updateStatus(Request $request, Task $task)
     {
+        $user = auth()->user();
+
+        // Only the assigned user OR an admin/manager may update status
+        $isAssigned   = $task->assigned_user_id && $task->assigned_user_id === $user->id;
+        $isPrivileged = $user->hasAnyRole(['admin', 'manager']);
+
+        if (! $isAssigned && ! $isPrivileged) {
+            abort(403, 'Only the assigned user or an admin/manager can update task status.');
+        }
+
         $request->validate([
             'status' => 'required|in:todo,in_progress,done',
         ]);

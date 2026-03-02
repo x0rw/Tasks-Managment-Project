@@ -31,9 +31,9 @@ class ProjectController extends Controller
         ]);
 
         Project::create([
-            'name' => $request->name,
+            'name'        => $request->name,
             'description' => $request->description,
-            'owner_id' => 1, // ✅ mock user id for now
+            'owner_id'    => auth()->id(),
         ]);
 
         return redirect()->route('projects.index')
