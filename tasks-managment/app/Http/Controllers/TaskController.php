@@ -11,26 +11,21 @@ use Illuminate\Support\Facades\Log;
 
 class TaskController extends Controller
 {
-    public function index($projectID)
+    public function index(Project $project)
     {
-        $tasks = Task::where(['project_id' => $projectID])->get();
-        $users = User::all();
-        $project = Project::findOrFail($projectID);
-
-        return view('tasks.index', compact('tasks', 'users', 'project'));
+        // Redirect to project view - all tasks are shown there
+        return redirect()->route('projects.show', $project);
     }
 
-    public function create($projectID)
+    public function create(Project $project)
     {
         $users = User::all();
         $tags  = Tag::all();
-        $project = Project::findOrFail($projectID);
         return view('tasks.create', compact('users', 'project', 'tags'));
     }
 
-    public function store(Request $request, string $projectID)
+    public function store(Request $request, Project $project)
     {
-
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -40,32 +35,44 @@ class TaskController extends Controller
             'assigned_user_id' => 'nullable|exists:users,id',
         ]);
 
-
-        $data['project_id'] = $projectID;
-        $project = Project::findOrFail($projectID);
         $task = $project->tasks()->create($data);
 
         // Sync tags
         $task->tags()->sync($request->tags ?? []);
 
-        return redirect()->route('projects.show', ["project" => $project])->with('success', 'Task created successfully.');
+        return redirect()->route('projects.tasks.index', $project)->with('success', 'Task created successfully.');
     }
 
-    public function edit(Task $task)
+    public function edit(Project $project, Task $task)
     {
+        // Ensure task belongs to project
+        if ($task->project_id !== $project->id) {
+            abort(404);
+        }
+
         $users = User::all();
         $tags  = Tag::all();
-        return view('tasks.edit', compact('task', 'users', 'tags'));
+        return view('tasks.edit', compact('task', 'users', 'tags', 'project'));
     }
 
-    public function show(Task $task)
+    public function show(Project $project, Task $task)
     {
+        // Ensure task belongs to project
+        if ($task->project_id !== $project->id) {
+            abort(404);
+        }
+
         $task->load(['comments.user', 'tags', 'assignedUser']);
-        return view('tasks.show', compact('task'));
+        return view('tasks.show', compact('task', 'project'));
     }
 
-    public function update(Request $request, Task $task)
+    public function update(Request $request, Project $project, Task $task)
     {
+        // Ensure task belongs to project
+        if ($task->project_id !== $project->id) {
+            abort(404);
+        }
+
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -80,11 +87,16 @@ class TaskController extends Controller
         // Sync tags
         $task->tags()->sync($request->tags ?? []);
 
-        return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
+        return redirect()->route('projects.tasks.index', $project)->with('success', 'Task updated successfully.');
     }
 
-    public function updateAssignment(Request $request, Task $task)
+    public function updateAssignment(Request $request, Project $project, Task $task)
     {
+        // Ensure task belongs to project
+        if ($task->project_id !== $project->id) {
+            abort(404);
+        }
+
         $request->validate([
             'assigned_user_id' => 'nullable|exists:users,id',
         ]);
@@ -96,8 +108,13 @@ class TaskController extends Controller
         return back()->with('success', 'Assignment updated.');
     }
 
-    public function updateStatus(Request $request, Task $task)
+    public function updateStatus(Request $request, Project $project, Task $task)
     {
+        // Ensure task belongs to project
+        if ($task->project_id !== $project->id) {
+            abort(404);
+        }
+
         $user = auth()->user();
 
         // Only the assigned user OR an admin/manager may update status
@@ -119,9 +136,81 @@ class TaskController extends Controller
         return back();
     }
 
-    public function destroy(Task $task)
+    public function destroy(Project $project, Task $task)
     {
+        // Ensure task belongs to project
+        if ($task->project_id !== $project->id) {
+            abort(404);
+        }
+
         $task->delete();
-        return redirect()->route('tasks.index')->with('success', 'Task deleted successfully.');
+        return redirect()->route('projects.tasks.index', $project)->with('success', 'Task deleted successfully.');
+    }
+
+    public function updatePriority(Request $request, Project $project, Task $task)
+    {
+        // Ensure task belongs to project
+        if ($task->project_id !== $project->id) {
+            abort(404);
+        }
+
+        $user = auth()->user();
+
+        // Only admin/manager may update priority
+        if (! $user->hasAnyRole(['admin', 'manager'])) {
+            abort(403, 'Only admin or manager can update task priority.');
+        }
+
+        $request->validate([
+            'priority' => 'required|in:low,medium,high',
+        ]);
+
+        $task->update([
+            'priority' => $request->priority,
+        ]);
+
+        return back()->with('success', 'Priority updated.');
+    }
+
+    public function updateDueDate(Request $request, Project $project, Task $task)
+    {
+        // Ensure task belongs to project
+        if ($task->project_id !== $project->id) {
+            abort(404);
+        }
+
+        $user = auth()->user();
+
+        // Only admin/manager may update due date
+        if (! $user->hasAnyRole(['admin', 'manager'])) {
+            abort(403, 'Only admin or manager can update task due date.');
+        }
+
+        $request->validate([
+            'due_date' => 'nullable|date',
+        ]);
+
+        $task->update([
+            'due_date' => $request->due_date,
+        ]);
+
+        return back()->with('success', 'Due date updated.');
+    }
+
+    public function updateTags(Request $request, Project $project, Task $task)
+    {
+        // Ensure task belongs to project
+        if ($task->project_id !== $project->id) {
+            abort(404);
+        }
+
+        $request->validate([
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,id',
+        ]);
+
+        $task->tags()->sync($request->tags ?? []);
+
+        return back()->with('success', 'Tags updated.');
     }
 }

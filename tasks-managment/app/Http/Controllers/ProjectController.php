@@ -43,9 +43,10 @@ class ProjectController extends Controller
     // Show single project
     public function show(Project $project)
     {
-
+        $project->load('tasks.tags');
         $users = User::all();
-        return view('projects.show', compact('project', 'users'));
+        $tags = \App\Models\Tag::all();
+        return view('projects.show', compact('project', 'users', 'tags'));
     }
 
     // Show edit form
