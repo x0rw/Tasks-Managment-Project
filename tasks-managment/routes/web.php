@@ -4,13 +4,11 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\TagController;
-use App\Http\Controllers\CommentController;
 
 Route::get('/', function () {
     return auth()->check()
         ? redirect()->route('projects.index')
-        : redirect()->route('login');
+        : view('welcome');
 })->name('home');
 
 Route::middleware('guest')->group(function () {
@@ -25,63 +23,28 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
-// ─── Authenticated routes ─────────────────────────────────────────────────
-
 Route::middleware('auth')->group(function () {
+    // Projects resource routes
+    Route::resource('projects', ProjectController::class);
 
-    // READ-ONLY: accessible to all authenticated users
-    Route::get('projects',               [ProjectController::class, 'index'])->name('projects.index');
-    Route::get('tasks/{task}',           [TaskController::class,   'show'])->name('tasks.show');
+    // Tags resource routes
+    Route::resource('tags', \App\Http\Controllers\TagController::class)->only(['index', 'store', 'update', 'destroy']);
 
-    // Tags — viewable by all auth users
-    Route::get('tags', [TagController::class, 'index'])->name('tags.index');
-
-    // Comments — all auth users can post and delete their own
-    Route::post('tasks/{task}/comments',        [CommentController::class, 'store'])->name('comments.store');
-    Route::delete('comments/{comment}',         [CommentController::class, 'destroy'])->name('comments.destroy');
-
-    // Status update: any authenticated user, but controller checks assigned_user_id
-    Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])
-        ->name('tasks.updateStatus');
-
-    // ─── Admin / Manager only ───────────────────────────────────────────────
-
-    Route::middleware('role:admin,manager')->group(function () {
-
-        // Projects — mutating (create MUST come before {project} wildcard)
-        Route::get('projects/create',            [ProjectController::class, 'create'])->name('projects.create');
-        Route::post('projects',                  [ProjectController::class, 'store'])->name('projects.store');
-        Route::get('projects/{project}/edit',    [ProjectController::class, 'edit'])->name('projects.edit');
-        Route::put('projects/{project}',         [ProjectController::class, 'update'])->name('projects.update');
-        Route::patch('projects/{project}',       [ProjectController::class, 'update']);
-        Route::delete('projects/{project}',      [ProjectController::class, 'destroy'])->name('projects.destroy');
-
-        // Tags — mutating
-        Route::post('tags',              [TagController::class, 'store'])->name('tags.store');
-        Route::put('tags/{tag}',         [TagController::class, 'update'])->name('tags.update');
-        Route::delete('tags/{tag}',      [TagController::class, 'destroy'])->name('tags.destroy');
-
-        // Tasks — mutating (create MUST come before {task} wildcard)
-        Route::get('tasks',                      [TaskController::class, 'index'])->name('tasks.index');
-        Route::get('tasks/create',               [TaskController::class, 'create'])->name('tasks.create');
-        Route::post('tasks',                     [TaskController::class, 'store'])->name('tasks.store');
-        Route::get('tasks/{task}/edit',          [TaskController::class, 'edit'])->name('tasks.edit');
-        Route::put('tasks/{task}',               [TaskController::class, 'update'])->name('tasks.update');
-        Route::patch('tasks/{task}',             [TaskController::class, 'update']);
-        Route::delete('tasks/{task}',            [TaskController::class, 'destroy'])->name('tasks.destroy');
-
-        // Task assignment
-        Route::patch('/tasks/{task}/assign', [TaskController::class, 'updateAssignment'])
-            ->name('tasks.updateAssignment');
-
-        // Tasks nested under a project
-        Route::prefix('projects/{project_id}')->group(function () {
-            Route::get('/tasks',        [TaskController::class, 'index'])->name('projects.tasks.index');
-            Route::get('/tasks/create', [TaskController::class, 'create'])->name('projects.tasks.create');
-            Route::post('/tasks/store', [TaskController::class, 'store'])->name('projects.tasks.store');
-        });
+    // All task routes scoped to projects
+    Route::prefix('projects/{project}')->name('projects.')->group(function () {
+        Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+        Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+        Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+        Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
+        Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
+        Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+        Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+        
+        // Quick update routes for inline editing
+        Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+        Route::patch('/tasks/{task}/assign', [TaskController::class, 'updateAssignment'])->name('tasks.updateAssignment');
+        Route::patch('/tasks/{task}/priority', [TaskController::class, 'updatePriority'])->name('tasks.updatePriority');
+        Route::patch('/tasks/{task}/due-date', [TaskController::class, 'updateDueDate'])->name('tasks.updateDueDate');
+        Route::patch('/tasks/{task}/tags', [TaskController::class, 'updateTags'])->name('tasks.updateTags');
     });
-
-    // projects/{project} wildcard MUST come AFTER all literal project routes
-    Route::get('projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
 });

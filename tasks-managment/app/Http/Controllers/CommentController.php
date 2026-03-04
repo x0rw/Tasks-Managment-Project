@@ -8,10 +8,7 @@ use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-    /**
-     * Store a new comment on a task.
-     * All authenticated users can comment (no role restriction).
-     */
+
     public function store(Request $request, Task $task)
     {
         $request->validate([
@@ -28,9 +25,6 @@ class CommentController extends Controller
         return back()->with('success', 'Comment added.');
     }
 
-    /**
-     * Delete a comment — only the author or an admin/manager may do this.
-     */
     public function destroy(Comment $comment)
     {
         $user = auth()->user();

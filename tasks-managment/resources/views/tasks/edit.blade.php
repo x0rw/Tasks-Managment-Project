@@ -6,7 +6,7 @@
 
     {{-- Page header --}}
     <div class="mb-6">
-        <a href="{{ route('tasks.index') }}" class="inline-flex items-center gap-1 text-sm text-base-content/50 hover:text-base-content transition-colors mb-4">
+        <a href="{{ route('projects.tasks.index', $project) }}" class="inline-flex items-center gap-1 text-sm text-base-content/50 hover:text-base-content transition-colors mb-4">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
             </svg>
@@ -33,7 +33,7 @@
     {{-- Form card --}}
     <div class="card bg-base-100 shadow">
         <div class="card-body">
-            <form action="{{ route('tasks.update', $task) }}" method="POST" class="space-y-5">
+            <form action="{{ route('projects.tasks.update', [$project, $task]) }}" method="POST" class="space-y-5">
                 @csrf
                 @method('PUT')
 
@@ -128,7 +128,7 @@
                 {{-- Actions --}}
                 <div class="flex items-center gap-3 pt-2">
                     <button type="submit" class="btn btn-primary flex-1">Save Changes</button>
-                    <a href="{{ route('tasks.index') }}" class="btn btn-ghost flex-1">Cancel</a>
+                    <a href="{{ route('projects.tasks.index', $project) }}" class="btn btn-ghost flex-1">Cancel</a>
                 </div>
 
             </form>

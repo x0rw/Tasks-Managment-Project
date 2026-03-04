@@ -12,7 +12,6 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         body { font-family: 'Instrument Sans', sans-serif; }
-        [x-cloak] { display: none !important; }
         .animate-fade-out {
             animation: fadeOut 4s ease forwards;
         }
@@ -42,11 +41,6 @@
                 <a href="{{ route('projects.index') }}"
                    class="btn btn-ghost btn-sm {{ request()->routeIs('projects.*') ? 'bg-base-200' : '' }}">
                     Projects
-                </a>
-
-                <a href="{{ route('tags.index') }}"
-                   class="btn btn-ghost btn-sm {{ request()->routeIs('tags.*') ? 'bg-base-200' : '' }}">
-                    Tags
                 </a>
 
                 <span class="text-sm text-base-content/70 hidden sm:inline">
