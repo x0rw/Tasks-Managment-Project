@@ -37,7 +37,11 @@
                 <tr>
 
                     {{-- Title --}}
-                    <td class="font-medium">{{ $task->title }}</td>
+                    <td class="font-medium">
+                        <a href="{{ route('projects.tasks.show', [$project, $task]) }}" class="link link-hover">
+                            {{ $task->title }}
+                        </a>
+                    </td>
 
                     {{-- Description --}}
                     <td class="text-base-content/60 max-w-xs">

@@ -7,7 +7,6 @@ use App\Models\Tag;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class TaskController extends Controller
 {
@@ -62,7 +61,7 @@ class TaskController extends Controller
             abort(404);
         }
 
-        $task->load(['comments.user', 'tags', 'assignedUser']);
+        $task->load(['comments.user', 'tags', 'assignedUser', 'attachments.uploader']);
         return view('tasks.show', compact('task', 'project'));
     }
 

@@ -5,7 +5,7 @@
 <div class="max-w-3xl mx-auto">
 
     {{-- Back link --}}
-    <a href="{{ url()->previous() }}" class="inline-flex items-center gap-1 text-sm text-base-content/50 hover:text-base-content transition-colors mb-6">
+    <a href="{{ route('projects.show', $project) }}" class="inline-flex items-center gap-1 text-sm text-base-content/50 hover:text-base-content transition-colors mb-6">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
         </svg>
@@ -54,6 +54,75 @@
         </div>
     </div>
 
+    {{-- ── Attachments ───────────────────────────────────────────────────── --}}
+    <h2 class="text-lg font-semibold mb-4">
+        Attachments
+        <span class="text-base-content/40 font-normal text-sm">({{ $task->attachments->count() }})</span>
+    </h2>
+
+    <div class="card bg-base-100 shadow mb-6">
+        <div class="card-body">
+            <form action="{{ route('projects.tasks.attachments.store', [$project, $task]) }}" method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
+                @csrf
+                <div class="form-control flex-1 w-full">
+                    <label class="label"><span class="label-text font-medium">Upload file</span></label>
+                    <input type="file" name="attachment" accept=".jpg,.jpeg,.png,.pdf" class="file-input file-input-bordered w-full" required>
+                    <p class="text-xs text-base-content/50 mt-1">Allowed: JPG, PNG, PDF · Max 5MB</p>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </form>
+
+            @error('attachment')
+                <p class="text-error text-sm mt-3">{{ $message }}</p>
+            @enderror
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow mb-6">
+        <div class="card-body p-0">
+            <div class="overflow-x-auto">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>File</th>
+                            <th>Type</th>
+                            <th>Size</th>
+                            <th>Uploaded By</th>
+                            <th class="w-28">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($task->attachments as $attachment)
+                            <tr>
+                                <td class="max-w-xs">
+                                    <a href="{{ \Illuminate\Support\Facades\Storage::url($attachment->file_path) }}" target="_blank" class="link link-primary break-all">
+                                        {{ $attachment->original_name }}
+                                    </a>
+                                </td>
+                                <td class="text-xs text-base-content/70">{{ $attachment->mime_type ?? '—' }}</td>
+                                <td class="text-xs text-base-content/70">{{ number_format($attachment->size / 1024, 1) }} KB</td>
+                                <td class="text-xs text-base-content/70">{{ $attachment->uploader?->name ?? 'Unknown' }}</td>
+                                <td>
+                                    @if(auth()->id() === $attachment->uploaded_by || auth()->user()->hasAnyRole(['admin','manager']))
+                                        <form action="{{ route('projects.tasks.attachments.destroy', [$project, $task, $attachment]) }}" method="POST" onsubmit="return confirm('Remove this attachment?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-ghost btn-xs text-error">Remove</button>
+                                        </form>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="py-6 text-center text-sm text-base-content/40">No attachments yet.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     {{-- ── Comments ─────────────────────────────────────────────────────── --}}
     <h2 class="text-lg font-semibold mb-4">
         Comments
@@ -63,7 +132,7 @@
     {{-- Add comment form --}}
     <div class="card bg-base-100 shadow mb-6">
         <div class="card-body">
-            <form action="{{ route('comments.store', $task) }}" method="POST" class="space-y-4">
+            <form action="{{ route('projects.comments.store', [$project, $task]) }}" method="POST" class="space-y-4">
                 @csrf
 
                 {{-- Validation errors --}}
@@ -121,7 +190,7 @@
 
                 {{-- Delete button — own comment or admin/manager --}}
                 @if(auth()->id() === $comment->user_id || auth()->user()->hasAnyRole(['admin','manager']))
-                <form action="{{ route('comments.destroy', $comment) }}" method="POST"
+                <form action="{{ route('projects.comments.destroy', [$project, $comment]) }}" method="POST"
                       onsubmit="return confirm('Delete this comment?')">
                     @csrf
                     @method('DELETE')

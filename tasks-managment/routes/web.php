@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TaskAttachmentController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ProjectController;
 
@@ -46,5 +48,11 @@ Route::middleware('auth')->group(function () {
         Route::patch('/tasks/{task}/priority', [TaskController::class, 'updatePriority'])->name('tasks.updatePriority');
         Route::patch('/tasks/{task}/due-date', [TaskController::class, 'updateDueDate'])->name('tasks.updateDueDate');
         Route::patch('/tasks/{task}/tags', [TaskController::class, 'updateTags'])->name('tasks.updateTags');
+        Route::post('/tasks/{task}/attachments', [TaskAttachmentController::class, 'store'])->name('tasks.attachments.store');
+        Route::delete('/tasks/{task}/attachments/{attachment}', [TaskAttachmentController::class, 'destroy'])->name('tasks.attachments.destroy');
+        
+        // Comments routes
+        Route::post('/tasks/{task}/comments', [CommentController::class, 'store'])->name('comments.store');
+        Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
     });
 });
